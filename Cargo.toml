@@ -14,4 +14,4 @@ numpy = { version = "0.25" }
 ndarray = "0.15.4"
 num-complex = "0.4.0"
 nalgebra = "0.32.1"
-tmatrix = { path = "../tmatrix" }
+tmatrix = { path = "./tmatrix-1" }
