@@ -178,7 +178,7 @@ jobs:
         with:
           command: upload
           # args: --non-interactive --skip-existing wheels-*/*
-          args: --non-interactive wheels-*/* sdist/*
+          args: --non-interactive --skip-existing wheels-*/* sdist/*
 
   release:
     name: Release
