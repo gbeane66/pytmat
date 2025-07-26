@@ -12,3 +12,6 @@ exclude examples/*
 exclude docs/*
 exclude dist/*
 exclude .github/*
+exclude .env
+exclude .env/*
+exclude .env/**
