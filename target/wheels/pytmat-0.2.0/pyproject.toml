@@ -1,0 +1,31 @@
+[build-system]
+requires = ["maturin>=1.8,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "pytmat"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
+dynamic = ["version"]
+[tool.maturin]
+features = ["pyo3/extension-module"]
+sdist-include = ["LICENSE", "README.md","pyproject.toml"]
+#Include additional files
+include = []
+# Exclude files
+exclude = []
+# Bindings type
+bindings = "pyo3"
+# auditwheel mode, possible values are repair, check and skip
+auditwheel = "repair"
+# Don't check for manylinux compliance, deprecated in favor of auditwheel = "audit"
+skip-auditwheel = false
+# Strip the library for minimum file size
+strip = true
+# Source distribution generator,
+# supports cargo (default) and git.
+sdist-generator = "cargo"

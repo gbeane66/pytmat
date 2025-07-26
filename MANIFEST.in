@@ -1,0 +1,14 @@
+# Include essential files
+include README.md
+include LICENSE
+include pyproject.toml
+
+# Exclude unnecessary files and directories
+exclude .gitignore
+exclude .git/*
+exclude target/*
+exclude tests/*
+exclude examples/*
+exclude docs/*
+exclude dist/*
+exclude .github/*

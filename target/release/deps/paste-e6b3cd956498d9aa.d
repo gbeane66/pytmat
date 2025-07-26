@@ -1,0 +1,8 @@
+/home/gbea0001/rust/pytmat/target/release/deps/libpaste-e6b3cd956498d9aa.so: /home/gbea0001/.cargo/registry/src/index.crates.io-6f17d22bba15001f/paste-1.0.15/src/lib.rs /home/gbea0001/.cargo/registry/src/index.crates.io-6f17d22bba15001f/paste-1.0.15/src/attr.rs /home/gbea0001/.cargo/registry/src/index.crates.io-6f17d22bba15001f/paste-1.0.15/src/error.rs /home/gbea0001/.cargo/registry/src/index.crates.io-6f17d22bba15001f/paste-1.0.15/src/segment.rs
+
+/home/gbea0001/rust/pytmat/target/release/deps/paste-e6b3cd956498d9aa.d: /home/gbea0001/.cargo/registry/src/index.crates.io-6f17d22bba15001f/paste-1.0.15/src/lib.rs /home/gbea0001/.cargo/registry/src/index.crates.io-6f17d22bba15001f/paste-1.0.15/src/attr.rs /home/gbea0001/.cargo/registry/src/index.crates.io-6f17d22bba15001f/paste-1.0.15/src/error.rs /home/gbea0001/.cargo/registry/src/index.crates.io-6f17d22bba15001f/paste-1.0.15/src/segment.rs
+
+/home/gbea0001/.cargo/registry/src/index.crates.io-6f17d22bba15001f/paste-1.0.15/src/lib.rs:
+/home/gbea0001/.cargo/registry/src/index.crates.io-6f17d22bba15001f/paste-1.0.15/src/attr.rs:
+/home/gbea0001/.cargo/registry/src/index.crates.io-6f17d22bba15001f/paste-1.0.15/src/error.rs:
+/home/gbea0001/.cargo/registry/src/index.crates.io-6f17d22bba15001f/paste-1.0.15/src/segment.rs:
