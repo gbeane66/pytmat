@@ -13,7 +13,7 @@ classifiers = [
 dynamic = ["version"]
 [tool.maturin]
 features = ["pyo3/extension-module"]
-sdist-include = ["LICENSE", "README.md"]
+sdist-include = ["LICENSE", "README.md","pyproject.toml"]
 #Include additional files
 include = []
 # Exclude files
