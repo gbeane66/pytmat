@@ -173,15 +173,12 @@ jobs:
         uses: actions/attest-build-provenance@v2
         with:
           subject-path: 'wheels-*/*'
-      # - name: Publish package distributions to PyPI
-      #   uses: PyO3/maturin-action@v1
-      #   with:
-      #     command: upload
-      #     args: --non-interactive --skip-existing wheels-*/*
       - name: Publish package distributions to PyPI
-        run: |
-          pip install --upgrade twine
-          twine upload --skip-existing *
+        uses: PyO3/maturin-action@v1
+        with:
+          command: upload
+          # args: --non-interactive --skip-existing wheels-*/*
+          args: --non-interactive
 
   release:
     name: Release
