@@ -81,8 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="pytmat" class="level1">
 <h1>🌈 pyTMat</h1>
-<p><a href="https://pypi.org/project/pytmat/"><img src="https://img.shields.io/pypi/v/pytmat.svg" class="img-fluid" alt="PyPI version"></a> <a href="https://pepy.tech/project/pytmat"><img src="https://static.pepy.tech/badge/pytmat.png" class="img-fluid" alt="Downloads"></a> <a href="https://github.com/gbeane66/pytmat/actions/workflows/CI.yml"><img src="https://github.com/gbeane66/pytmat/actions/workflows/CI.yml/badge.svg" class="img-fluid" alt="CI"></a> <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" class="img-fluid" alt="License: MIT"></a> <img src="https://img.shields.io/badge/python-3.8%2B-blue" class="img-fluid" alt="Python 3.8+"></p>
-<p><strong>pyTMat</strong> is a blazing-fast, user-friendly Python package for simulating optical multilayer stacks using the Transfer Matrix Method (TMM). Powered by a Rust core for maximum performance, pyTMat makes it easy to compute reflection and transmission spectra for complex photonic structures — perfect for research, engineering, and education.</p>
+<p><strong>pyTMat</strong> is a blazing-fast, user-friendly Python package for simulating optical multilayer stacks using the Transfer Matrix Method (TMM). Powered by a Rust core for maximum performance, pyTMat makes it easy to compute reflection and transmission spectra for complex photonic structures—perfect for research, engineering, and education.</p>
 <hr>
 <section id="features" class="level2">
 <h2 class="anchored" data-anchor-id="features">🚀 Features</h2>
@@ -91,11 +90,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>Easy-to-use</strong>: Simple Python API, no need to write Rust</li>
 <li><strong>Parallelized</strong>: Automatically uses all your CPU cores for large wavelength arrays</li>
 <li><strong>Polarization Support</strong>: TE, TM, and arbitrary polarization angles</li>
-<li><strong>Complex Refractive Indices</strong>: Supports lossy materials with complex indices</li>
-<li><strong>Flexible Layer Configurations</strong>: Any number of layers with arbitrary thicknesses</li>
-<li><strong>Incident Angles</strong>: Specify any angle of incidence</li>
-<li><strong>Wavelength Range</strong>: Define custom wavelength ranges for your simulations</li>
-<li><strong>Numpy Integration</strong>: Works seamlessly with NumPy arrays</li>
+<li><strong>Flexible</strong>: Any number of layers, complex refractive indices, and arbitrary thicknesses</li>
 <li><strong>Perfect for DBRs, filters, sensors, and more!</strong></li>
 </ul>
 <hr>
@@ -104,108 +99,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="installation">📦 Installation</h2>
 <p>Install the latest release directly from <a href="https://pypi.org/project/pytmat/">PyPI</a>:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pytmat</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<hr>
+<p>import numpy as np import pytmat</p>
 </section>
-<section id="quick-start" class="level2">
-<h2 class="anchored" data-anchor-id="quick-start">🧑‍💻 Quick Start</h2>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pytmat</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Define layer thicknesses (nm)</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> np.array([<span class="dv">100</span>, <span class="dv">200</span>, <span class="dv">100</span>])  <span class="co"># Example: 3 layers</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Define complex refractive indices for each layer at each wavelength</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Shape: (num_layers, num_wavelengths)</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> np.array([</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">1.0</span><span class="op">+</span><span class="ot">0j</span>, <span class="fl">1.0</span><span class="op">+</span><span class="ot">0j</span>, <span class="fl">1.0</span><span class="op">+</span><span class="ot">0j</span>],   <span class="co"># Layer 1</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">2.0</span><span class="op">+</span><span class="ot">0j</span>, <span class="fl">2.0</span><span class="op">+</span><span class="ot">0j</span>, <span class="fl">2.0</span><span class="op">+</span><span class="ot">0j</span>],   <span class="co"># Layer 2</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">1.5</span><span class="op">+</span><span class="ot">0j</span>, <span class="fl">1.5</span><span class="op">+</span><span class="ot">0j</span>, <span class="fl">1.5</span><span class="op">+</span><span class="ot">0j</span>],   <span class="co"># Layer 3</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>])</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Wavelengths (nm)</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>wl <span class="op">=</span> np.linspace(<span class="dv">400</span>, <span class="dv">700</span>, <span class="dv">3</span>)</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Angle of incidence (radians) and polarization angle (radians)</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>theta <span class="op">=</span> <span class="fl">0.0</span>  <span class="co"># normal incidence</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>phi <span class="op">=</span> <span class="fl">0.0</span>    <span class="co"># TE polarization</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the TMM data object</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pytmat.Data(d, n, wl, theta, phi)</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute reflection and transmission spectra</span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>R <span class="op">=</span> data.get_r_power_vec()</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>T <span class="op">=</span> data.get_t_power_vec()</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Reflection:"</span>, R)</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Transmission:"</span>, T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<hr>
 </section>
-<section id="api-overview" class="level2">
-<h2 class="anchored" data-anchor-id="api-overview">📚 API Overview</h2>
-<ul>
-<li><code>Data(d, n, wl, theta, phi)</code>: Main class for defining your multilayer stack.
-<ul>
-<li><code>d</code>: 1D array of layer thicknesses (float, nm or μm)</li>
-<li><code>n</code>: 2D array of complex refractive indices (layers × wavelengths)</li>
-<li><code>wl</code>: 1D array of wavelengths</li>
-<li><code>theta</code>: Angle of incidence (radians)</li>
-<li><code>phi</code>: Polarization angle (radians, 0=TE, π/2=TM)</li>
-</ul></li>
-<li><code>get_r_power_vec()</code>: Returns reflection spectrum (array)</li>
-<li><code>get_t_power_vec()</code>: Returns transmission spectrum (array)</li>
-</ul>
-<hr>
+<section id="define-layer-thicknesses-nm" class="level1">
+<h1>Define layer thicknesses (nm)</h1>
+<p>d = np.array([100, 200, 100]) # Example: 3 layers</p>
 </section>
-<section id="advanced-usage" class="level2">
-<h2 class="anchored" data-anchor-id="advanced-usage">🛠️ Advanced Usage</h2>
-<ul>
-<li><strong>Arbitrary polarization</strong>: Set <code>phi</code> between 0 (TE) and π/2 (TM) for mixed polarization.</li>
-<li><strong>Large arrays</strong>: For &gt;100 wavelengths, pyTMat automatically parallelizes computations.</li>
-<li><strong>Complex indices</strong>: Supports lossy materials (complex n).</li>
-</ul>
-<hr>
+<section id="define-complex-refractive-indices-for-each-layer-at-each-wavelength" class="level1">
+<h1>Define complex refractive indices for each layer at each wavelength</h1>
 </section>
-<section id="project-structure" class="level2">
-<h2 class="anchored" data-anchor-id="project-structure">🏗️ Project Structure</h2>
-<pre><code>pytmat/
-├── tmatrix/         # Rust core library
-├── pytmat/          # Python bindings (PyO3/maturin)
-├── tests/           # Python tests
-├── README.md
-└── ...</code></pre>
-<hr>
+<section id="shape-num_layers-num_wavelengths" class="level1">
+<h1>Shape: (num_layers, num_wavelengths)</h1>
+<p>n = np.array([ [1.0+0j, 1.0+0j, 1.0+0j], # Layer 1 [2.0+0j, 2.0+0j, 2.0+0j], # Layer 2 [1.5+0j, 1.5+0j, 1.5+0j], # Layer 3])</p>
 </section>
-<section id="contributing" class="level2">
-<h2 class="anchored" data-anchor-id="contributing">🤝 Contributing</h2>
-<p>Contributions, bug reports, and feature requests are welcome!<br>
-Please open an issue or submit a pull request.</p>
-<hr>
+<section id="wavelengths-nm" class="level1">
+<h1>Wavelengths (nm)</h1>
+<p>wl = np.linspace(400, 700, 3)</p>
 </section>
-<section id="license" class="level2">
-<h2 class="anchored" data-anchor-id="license">📄 License</h2>
-<p>This project is licensed under the MIT License.</p>
-<hr>
+<section id="angle-of-incidence-radians-and-polarization-angle-radians" class="level1">
+<h1>Angle of incidence (radians) and polarization angle (radians)</h1>
+<p>theta = 0.0 # normal incidence phi = 0.0 # TE polarization</p>
 </section>
-<section id="acknowledgements" class="level2">
-<h2 class="anchored" data-anchor-id="acknowledgements">🌟 Acknowledgements</h2>
-<ul>
-<li>Built with <a href="https://www.rust-lang.org/">Rust</a> and <a href="https://pyo3.rs/">PyO3</a></li>
-<li>Uses <a href="https://nalgebra.org/">nalgebra</a>, <a href="https://docs.rs/ndarray/">ndarray</a>, and <a href="https://docs.rs/rayon/">rayon</a></li>
-</ul>
-<hr>
+<section id="create-the-tmm-data-object" class="level1">
+<h1>Create the TMM data object</h1>
+<p>data = pytmat.Data(d, n, wl, theta, phi)</p>
 </section>
-<section id="links" class="level2">
-<h2 class="anchored" data-anchor-id="links">🔗 Links</h2>
-<ul>
-<li><a href="https://pypi.org/project/pytmat/">PyPI</a></li>
-<li><a href="https://your-docs-link-here">Documentation</a></li>
-<li><a href="https://github.com/yourusername/pytmat/issues">Issues</a></li>
-</ul>
-<hr>
-<blockquote class="blockquote">
-<p><strong>pyTMat</strong> — Fast, flexible, and fun multilayer optics for Python</p>
-</blockquote>
-</section>
+<section id="compute-reflection-and-transmission-spectra" class="level1">
+<h1>Compute reflection and transmission spectra</h1>
+<p>R = data.get_r_power_vec() T = data.get_t_power_vec()</p>
+<p>print(“Reflection:”, R) print(“Transmission:”, T)</p>
 </section>
 
 </main>

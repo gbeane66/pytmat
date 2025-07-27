@@ -10,8 +10,6 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
-keywords = ["optics", "transfer-matrix", "tmm", "multilayer", "photonic", "rust", "python", "simulation"]
-description = "A Python package for simulating optical multilayer structures using the transfer matrix method, implemented in Rust."
 dynamic = ["version"]
 
 [tool.maturin]

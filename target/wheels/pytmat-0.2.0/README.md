@@ -1,12 +1,5 @@
 # 🌈 pyTMat
 
-[![PyPI version](https://img.shields.io/pypi/v/pytmat.svg)](https://pypi.org/project/pytmat/)
-[![Downloads](https://static.pepy.tech/badge/pytmat)](https://pepy.tech/project/pytmat)
-[![CI](https://github.com/gbeane66/pytmat/actions/workflows/CI.yml/badge.svg)](https://github.com/gbeane66/pytmat/actions/workflows/CI.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-blue)
-
-
 **pyTMat** is a blazing-fast, user-friendly Python package for simulating optical multilayer stacks using the Transfer Matrix Method (TMM). Powered by a Rust core for maximum performance, pyTMat makes it easy to compute reflection and transmission spectra for complex photonic structures — perfect for research, engineering, and education.
 
 ---
