@@ -41,48 +41,58 @@ pip install pytmat
 ```python
 import numpy as np
 import pytmat
+import matplotlib.pyplot as plt
 
 # Define layer thicknesses (nm)
-d = np.array([100, 200, 100])  # Example: 3 layers
+d = np.array([200])  # Example: 3 layers, with two seminfinite layers on either side of a 200 nm layer.
 
 # Define complex refractive indices for each layer at each wavelength
 # Shape: (num_layers, num_wavelengths)
 n = np.array([
-    [1.0+0j, 1.0+0j, 1.0+0j],   # Layer 1
-    [2.0+0j, 2.0+0j, 2.0+0j],   # Layer 2
-    [1.5+0j, 1.5+0j, 1.5+0j],   # Layer 3
+    [1.0+0j, 1.0+0j, 1.0+0j],   # Layer 1, seminfinite air layer
+    [1.5+0j, 1.5+0j, 1.5+0j],   # Layer 2, 200 nm glass layer
+    [1.0+0j, 1.0+0j, 1.0+0j],   # Layer 3, seminfinite air layer
 ])
 
 # Wavelengths (nm)
-wl = np.linspace(400, 700, 3)
+wl = np.linspace(400, 700, 300)
 
 # Angle of incidence (radians) and polarization angle (radians)
 theta = 0.0  # normal incidence
 phi = 0.0    # TE polarization
 
 # Create the TMM data object
-data = pytmat.Data(d, n, wl, theta, phi)
+data = pytmat.DataPy(d, n, wl, theta, phi)
+
+# Simulate the multilayer stack
+simulation = data.simulate()
 
 # Compute reflection and transmission spectra
-R = data.get_r_power_vec()
-T = data.get_t_power_vec()
+R, T = simulation.r, simulation.t
 
-print("Reflection:", R)
-print("Transmission:", T)
+fig, ax = plt.subplots()
+ax.plot(wl, R, label='Reflection',color='blue')
+ax.plot(wl, T, label='Transmission', color='orange')
+ax.set_xlabel('Wavelength (nm)')
+ax.set_ylabel('Reflectance / Transmittance')
+plt.title('Multilayer Stack Reflection and Transmission')
+ax.legend()
 ```
 
 ---
 
 ## 📚 API Overview
 
-- `Data(d, n, wl, theta, phi)`: Main class for defining your multilayer stack.
+- `DataPy(d, n, wl, theta, phi)`: Main class for defining your multilayer stack.
     - `d`: 1D array of layer thicknesses (float, nm or μm)
     - `n`: 2D array of complex refractive indices (layers × wavelengths)
     - `wl`: 1D array of wavelengths
     - `theta`: Angle of incidence (radians)
     - `phi`: Polarization angle (radians, 0=TE, π/2=TM)
-- `get_r_power_vec()`: Returns reflection spectrum (array)
-- `get_t_power_vec()`: Returns transmission spectrum (array)
+- `simulate()`: DataPy method to run the simulation.
+- `Simulation`: Result object containing:
+    - `r`: Reflection spectrum (array)
+    - `t`: Transmission spectrum (array)
 
 ---
 
