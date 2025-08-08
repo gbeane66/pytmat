@@ -15,6 +15,7 @@ N = 300
 # The middle layer is a glass layer with a refractive index of 1.5
 n_air = np.full(N, 1.0, dtype=np.complex128)
 n_glass = np.full(N, 1.5, dtype=np.complex128)
+
 n = np.array([n_air,n_glass,n_air])
 
 # Wavelengths (nm)
