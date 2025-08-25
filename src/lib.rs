@@ -96,3 +96,22 @@ fn pytmat(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<Simulation>()?;
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use numpy::ndarray::array;
+    use numpy::Complex64;
+
+    #[test]
+    fn test_data_py_creation() {
+        let d = array![200.0];
+        let n = array![[Complex64::new(1.0, 0.0)], [Complex64::new(1.5, 0.0)], [Complex64::new(1.0, 0.0)]];
+        let wl = array![500.0];
+        let theta = 0.0;
+        let phi = 0.0;
+        let data = DataPy { d, n, wl, theta, phi };
+        assert_eq!(data.d.len(), 1);
+        assert_eq!(data.n.shape(), &[3, 1]);
+    }
+}
