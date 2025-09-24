@@ -23,7 +23,7 @@ impl DataPy {
     /// Create a new multilayer optical structure
     /// 
     /// Parameters:
-    /// - d: Layer thicknesses (1D array)
+    /// - d: Layer thicknesses (1D array) - should have length = num_layers - 2
     /// - n: Complex refractive indices (2D array: layers × wavelengths)
     /// - wl: Wavelength array (1D array)
     /// - theta: Incident angle in radians
@@ -39,13 +39,58 @@ impl DataPy {
         let n_array = n.as_array();
         let n_2d = n_array.into_dimensionality::<numpy::ndarray::Dim<[usize;2]>>()
             .map_err(|_| PyErr::new::<pyo3::exceptions::PyValueError, _>(
-                "Failed to convert refractive index array to 2D array"
+                "Refractive index array must be 2-dimensional (layers × wavelengths)"
             ))?;
         
+        let d_array = d.as_array();
+        let wl_array = wl.as_array();
+        
+        // Validate input dimensions
+        let num_layers = n_2d.shape()[0];
+        let num_wavelengths = n_2d.shape()[1];
+        
+        if d_array.len() != num_layers - 2 {
+            return Err(PyErr::new::<pyo3::exceptions::PyValueError, _>(
+                format!(
+                    "Layer thickness array length ({}) must be num_layers - 2 ({}). \
+                     First and last layers are semi-infinite.",
+                    d_array.len(), num_layers - 2
+                )
+            ));
+        }
+        
+        if wl_array.len() != num_wavelengths {
+            return Err(PyErr::new::<pyo3::exceptions::PyValueError, _>(
+                format!(
+                    "Wavelength array length ({}) must match refractive index wavelength dimension ({})",
+                    wl_array.len(), num_wavelengths
+                )
+            ));
+        }
+        
+        // Validate physical constraints
+        if theta < 0.0 || theta > std::f64::consts::PI / 2.0 {
+            return Err(PyErr::new::<pyo3::exceptions::PyValueError, _>(
+                "Incident angle must be between 0 and π/2 radians"
+            ));
+        }
+        
+        if d_array.iter().any(|&thickness| thickness <= 0.0) {
+            return Err(PyErr::new::<pyo3::exceptions::PyValueError, _>(
+                "All layer thicknesses must be positive"
+            ));
+        }
+        
+        if wl_array.iter().any(|&wavelength| wavelength <= 0.0) {
+            return Err(PyErr::new::<pyo3::exceptions::PyValueError, _>(
+                "All wavelengths must be positive"
+            ));
+        }
+        
         Ok(DataPy { 
-            d: d.as_array().to_owned(), 
+            d: d_array.to_owned(), 
             n: n_2d.to_owned(), 
-            wl: wl.as_array().to_owned(), 
+            wl: wl_array.to_owned(), 
             theta, 
             phi 
         })
@@ -176,6 +221,21 @@ impl Simulation {
                 .map(|(t, r)| 1.0 - t - r)
         );
         Ok(absorbance.to_pyarray(py))
+    }
+    
+    /// Check energy conservation (R + T + A = 1)
+    /// Returns the maximum deviation from unity
+    fn energy_conservation_error(&self) -> f64 {
+        self.t.iter().zip(self.r.iter())
+            .map(|(t, r)| (1.0 - t - r).abs())
+            .fold(0.0f64, |acc, x| acc.max(x))
+    }
+    
+    /// Validate that energy is conserved within tolerance
+    fn validate_energy_conservation(&self, tolerance: Option<f64>) -> PyResult<bool> {
+        let tol = tolerance.unwrap_or(1e-6);
+        let max_error = self.energy_conservation_error();
+        Ok(max_error < tol)
     }
 }
 

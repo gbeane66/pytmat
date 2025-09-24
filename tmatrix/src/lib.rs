@@ -7,22 +7,71 @@
 //! - Use parralellization for consideration of wavelength arrays where the number of entries is larger than 100.
 
 use nalgebra::Matrix2;
-
 use num_complex::{Complex, ComplexFloat};
 use ndarray::{Array1,Array2};
 use std;
 use once_cell::unsync::OnceCell;
-
 use rayon::prelude::*;
 
+// Mathematical constants
 const PI: f64 = std::f64::consts::PI;
+const TWO_PI: f64 = 2.0 * PI;
 const IMAG: Complex<f64> = Complex::new(0.0, 1.0);
+const ONE: Complex<f64> = Complex::new(1.0, 0.0);
+const ZERO: Complex<f64> = Complex::new(0.0, 0.0);
+
+// Performance threshold for parallel processing
+const PARALLEL_THRESHOLD: usize = 100;
 
 // Define ComplexF64 and LayerMatrix types for convenience
 type ComplexF64 = Complex<f64>;
 type LayerMatrix = Matrix2<ComplexF64>;
 
-/// An enum used to account for the two different TE and TM polarizations
+/// Helper functions for optical calculations
+mod optical_math {
+    use super::*;
+    
+    /// Calculate cosine of refraction angle using Snell's law
+    #[inline(always)]
+    pub fn cos_refraction_angle(n: ComplexF64, n0_sin_theta0_squared: ComplexF64) -> ComplexF64 {
+        (n * n - n0_sin_theta0_squared).sqrt() / n
+    }
+    
+    /// Calculate Fresnel coefficients for TE and TM polarization
+    #[inline(always)]  
+    pub fn fresnel_coefficients(
+        ni: ComplexF64,
+        nip1: ComplexF64,
+        cos_ni: ComplexF64,
+        cos_nip1: ComplexF64,
+        polarization: &Polarization
+    ) -> (ComplexF64, ComplexF64) {
+        match polarization {
+            Polarization::TE => (
+                (ni * cos_ni - nip1 * cos_nip1) / (ni * cos_ni + nip1 * cos_nip1),
+                (2.0 * ni * cos_ni) / (ni * cos_ni + nip1 * cos_nip1),
+            ),
+            Polarization::TM => (
+                (nip1 * cos_ni - ni * cos_nip1) / (nip1 * cos_ni + ni * cos_nip1),
+                (2.0 * ni * cos_ni) / (nip1 * cos_ni + ni * cos_nip1),
+            ),
+        }
+    }
+    
+    /// Create propagation matrix for a layer
+    #[inline(always)]
+    pub fn propagation_matrix(kz: ComplexF64, thickness: f64) -> LayerMatrix {
+        let exp_pos = (IMAG * kz * thickness).exp();
+        let exp_neg = (-IMAG * kz * thickness).exp();
+        Matrix2::new(exp_neg, ZERO, ZERO, exp_pos)
+    }
+    
+    /// Create interface matrix  
+    #[inline(always)]
+    pub fn interface_matrix(r: ComplexF64, t: ComplexF64) -> LayerMatrix {
+        Matrix2::new(ONE / t, r / t, r / t, ONE / t)
+    }
+}
 pub enum Polarization {
     /// Transverse Electric
     TE, 
@@ -67,8 +116,8 @@ impl Transfer {
         let cos2phi = polarization_angle.cos().powi(2);
         let sin2phi = polarization_angle.sin().powi(2);
 
-        let t_te = Complex::new(1.0, 0.0) / self.t_final_te[(0, 0)];
-        let t_tm = Complex::new(1.0, 0.0) / self.t_final_tm[(0, 0)];
+        let t_te = ONE / self.t_final_te[(0, 0)];
+        let t_tm = ONE / self.t_final_tm[(0, 0)];
 
         (scaling_factor.re) * (cos2phi * t_te.abs().powi(2) + sin2phi * t_tm.abs().powi(2))
     }
@@ -167,58 +216,33 @@ impl Data {
     ) -> LayerMatrix {
         let wavelength = wl[j];
         let n0 = n[[0, j]];
-        let nsin_theta0_squared = (n0 * theta.sin()).powi(2);
-
-        // Calculate cosine of angle for each layer
-        let cos_angle = |ni: ComplexF64| (ni * ni - nsin_theta0_squared).sqrt() / ni;
-
-        // Calculate reflection and transmission coefficients based on polarization
-        let calc_coefficients = |ni: ComplexF64, nip1: ComplexF64, cos_ni: ComplexF64, cos_nip1: ComplexF64| {
-            match polarization {
-                Polarization::TE => (
-                    (ni * cos_ni - nip1 * cos_nip1) / (ni * cos_ni + nip1 * cos_nip1),
-                    (2.0 * ni * cos_ni) / (ni * cos_ni + nip1 * cos_nip1),
-                ),
-                Polarization::TM => (
-                    (nip1 * cos_ni - ni * cos_nip1) / (nip1 * cos_ni + ni * cos_nip1),
-                    (2.0 * ni * cos_ni) / (nip1 * cos_ni + ni * cos_nip1),
-                ),
-            }
-        };
-
-        let one = Complex::new(1.0, 0.0);
-        let zero = Complex::new(0.0, 0.0);
-        let two_pi = 2.0 * PI;
+        let n0_sin_theta0_squared = (n0 * theta.sin()).powi(2);
 
         // Initialize with first interface
         let n1 = n[[1, j]];
-        let cos_theta_0 = cos_angle(n0);
-        let cos_theta_1 = cos_angle(n1);
-        let (mut r, mut t) = calc_coefficients(n0, n1, cos_theta_0, cos_theta_1);
+        let cos_theta_0 = optical_math::cos_refraction_angle(n0, n0_sin_theta0_squared);
+        let cos_theta_1 = optical_math::cos_refraction_angle(n1, n0_sin_theta0_squared);
+        let (mut r, mut t) = optical_math::fresnel_coefficients(n0, n1, cos_theta_0, cos_theta_1, &polarization);
 
-        let mut transfer_total = Matrix2::new(one / t, r / t, r / t, one / t);
+        let mut transfer_total = optical_math::interface_matrix(r, t);
 
         // Process intermediate layers
         for i in 1..n.shape()[0] - 1 {
             let ni = n[[i, j]];
             let nip1 = n[[i + 1, j]];
-            let cos_ni = cos_angle(ni);
-            let cos_nip1 = cos_angle(nip1);
+            let cos_ni = optical_math::cos_refraction_angle(ni, n0_sin_theta0_squared);
+            let cos_nip1 = optical_math::cos_refraction_angle(nip1, n0_sin_theta0_squared);
 
             // Propagation matrix through the layer
-            let kz = (two_pi * cos_ni * ni) / wavelength;
+            let kz = (TWO_PI * cos_ni * ni) / wavelength;
             let layer_thickness = d[i - 1];
-            let exponent_pos = (IMAG * kz * layer_thickness).exp();
-            let exponent_neg = (-IMAG * kz * layer_thickness).exp();
-
-            let propagation_matrix = Matrix2::new(exponent_neg, zero, zero, exponent_pos);
+            let propagation_matrix = optical_math::propagation_matrix(kz, layer_thickness);
 
             // Interface matrix
-            let (r_new, t_new) = calc_coefficients(ni, nip1, cos_ni, cos_nip1);
+            let (r_new, t_new) = optical_math::fresnel_coefficients(ni, nip1, cos_ni, cos_nip1, &polarization);
             r = r_new;
             t = t_new;
-
-            let interface_matrix = Matrix2::new(one / t, r / t, r / t, one / t);
+            let interface_matrix = optical_math::interface_matrix(r, t);
 
             transfer_total = transfer_total * propagation_matrix * interface_matrix;
         }
@@ -236,7 +260,7 @@ impl Data {
     /// Uses parallelization for large wavelength arrays (>100 elements)
     pub fn transfer_calc(&self) -> Vec<Transfer> {
         let wl_len = self.wl.len();
-        let use_parallel = wl_len > 100;
+        let use_parallel = wl_len > PARALLEL_THRESHOLD;
 
         let (te_transfers, tm_transfers): (Vec<_>, Vec<_>) = if use_parallel {
             // Clone necessary data for parallel processing to avoid borrowing issues
